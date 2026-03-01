@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TIERFORGE — Rank Everything</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --bg:#080808;--surface:#111;--surface2:#181818;--surface3:#202020;
+  --border:#242424;--border2:#2e2e2e;--text:#efefef;--muted:#555;--muted2:#888;
+  --accent:#e8ff3c;--accent2:#b8cc00;
+  --red:#ff4545;--orange:#ff8c42;--yellow:#ffd700;--green:#6fff6e;--blue:#4eb8ff;--purple:#c084ff;--pink:#ff5cae;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-height:100vh;overflow-x:hidden}
+body::after{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");pointer-events:none;z-index:9999;opacity:.5}
+nav{display:flex;align-items:center;justify-content:space-between;padding:0 28px;height:58px;border-bottom:1px solid var(--border);position:sticky;top:0;background:rgba(8,8,8,.94);backdrop-filter:blur(16px);z-index:200}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:4px;color:var(--accent);cursor:pointer}
+.logo span{color:var(--text)}
+.nav-tabs{display:flex;gap:2px}
+.nav-tab{background:none;border:none;color:var(--muted2);font-family:'Syne',sans-serif;font-size:12px;font-weight:700;padding:7px 14px;border-radius:6px;cursor:pointer;transition:all .15s;letter-spacing:.5px;text-transform:uppercase}
+.nav-tab:hover{color:var(--text);background:var(--surface)}
+.nav-tab.active{color:var(--accent);background:rgba(232,255,60,.08)}
+.nav-right{display:flex;gap:8px;align-items:center}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:6px;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;cursor:pointer;border:none;transition:all .15s;letter-spacing:.5px;text-transform:uppercase;white-space:nowrap}
+.btn-ghost{background:transparent;color:var(--muted2);border:1px solid var(--border2)}
+.btn-ghost:hover{color:var(--text);border-color:#444}
+.btn-primary{background:var(--accent);color:#000}
+.btn-primary:hover{background:var(--accent2);transform:translateY(-1px)}
+.btn-pro{background:linear-gradient(135deg,#ffd700,#ff8c42);color:#000}
+.btn-pro:hover{transform:translateY(-1px);filter:brightness(1.05)}
+.btn-sm{padding:6px 12px;font-size:11px}
+.page{display:none;min-height:calc(100vh - 58px)}
+.page.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+
+/* EXPLORE */
+#page-explore{padding:0}
+.explore-hero{padding:52px 32px 36px;max-width:1100px;margin:0 auto}
+.hero-eyebrow{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--accent);margin-bottom:10px}
+.hero-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(50px,9vw,96px);line-height:.9;letter-spacing:2px;margin-bottom:14px}
+.hero-title em{color:var(--accent);font-style:normal}
+.hero-sub{color:var(--muted2);font-size:14px;max-width:460px;line-height:1.6;margin-bottom:28px}
+.hero-actions{display:flex;gap:10px;flex-wrap:wrap}
+.explore-filters{padding:0 32px 20px;max-width:1100px;margin:0 auto;display:flex;gap:7px;flex-wrap:wrap}
+.filter-chip{background:var(--surface);border:1px solid var(--border2);color:var(--muted2);font-family:'Syne',sans-serif;font-size:11px;font-weight:700;padding:6px 13px;border-radius:20px;cursor:pointer;transition:all .15s;text-transform:uppercase;letter-spacing:.5px}
+.filter-chip:hover{border-color:#444;color:var(--text)}
+.filter-chip.active{background:rgba(232,255,60,.1);border-color:var(--accent);color:var(--accent)}
+.explore-grid{padding:0 32px 60px;max-width:1100px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:14px}
+.list-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;cursor:pointer;transition:all .2s;position:relative;animation:fadeUp .3s ease both}
+.list-card:hover{border-color:var(--border2);transform:translateY(-3px);box-shadow:0 20px 50px rgba(0,0,0,.5)}
+.list-card-header{padding:14px 14px 10px;display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.list-card-title{font-family:'Bebas Neue',sans-serif;font-size:21px;letter-spacing:1px;line-height:1;flex:1}
+.list-card-tag{font-size:9px;text-transform:uppercase;letter-spacing:1px;padding:3px 7px;border-radius:4px;font-weight:700;white-space:nowrap;flex-shrink:0}
+.list-card-tiers{padding:0 10px 10px;display:flex;flex-direction:column;gap:3px}
+.mini-tier{display:flex;align-items:center;gap:5px;border-radius:4px;overflow:hidden;min-height:26px}
+.mini-label{width:26px;min-width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:13px}
+.mini-items{flex:1;display:flex;gap:3px;flex-wrap:wrap;padding:2px 6px;background:var(--surface2);align-items:center}
+.mini-item-text{font-size:10px;color:var(--muted2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:70px}
+.list-card-footer{padding:9px 14px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.card-meta{font-size:11px;color:var(--muted)}
+.card-votes{display:flex;align-items:center;gap:4px;font-size:12px;font-weight:700;color:var(--muted2)}
+.vote-btn{background:none;border:none;cursor:pointer;color:var(--muted);font-size:14px;transition:color .15s;padding:2px;line-height:1}
+.vote-btn:hover,.vote-btn.voted{color:var(--accent)}
+.trending-badge{position:absolute;top:10px;right:10px;background:var(--red);color:#fff;font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;padding:3px 6px;border-radius:4px}
+
+/* TEMPLATES */
+#page-templates{padding:32px 28px 60px;max-width:1100px;margin:0 auto}
+.templates-header{margin-bottom:28px}
+.templates-header h1{font-family:'Bebas Neue',sans-serif;font-size:52px;letter-spacing:2px;margin-bottom:4px}
+.templates-header p{color:var(--muted2);font-size:14px}
+.template-search{width:100%;max-width:500px;background:var(--surface);border:1px solid var(--border2);border-radius:8px;padding:12px 16px;font-family:'Syne',sans-serif;font-size:14px;color:var(--text);outline:none;transition:border-color .2s;margin-bottom:32px}
+.template-search:focus{border-color:var(--accent)}
+.template-search::placeholder{color:var(--muted)}
+.template-category-section{margin-bottom:36px}
+.template-category-title{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:2px;margin-bottom:12px;display:flex;align-items:center;gap:10px;color:var(--text)}
+.template-category-title::after{content:'';flex:1;height:1px;background:var(--border)}
+.template-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
+.template-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;cursor:pointer;transition:all .18s;position:relative;overflow:hidden}
+.template-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--accent);transform:scaleX(0);transform-origin:left;transition:transform .2s}
+.template-card:hover{border-color:var(--border2);transform:translateY(-2px)}
+.template-card:hover::before{transform:scaleX(1)}
+.template-card-emoji{font-size:26px;margin-bottom:8px;display:block}
+.template-card-name{font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:1px;margin-bottom:3px;line-height:1.1}
+.template-card-count{font-size:10px;color:var(--muted);margin-bottom:8px}
+.template-card-preview{display:flex;flex-wrap:wrap;gap:3px;margin-bottom:10px}
+.template-preview-item{font-size:9px;background:var(--surface2);border:1px solid var(--border);border-radius:3px;padding:2px 5px;color:var(--muted2)}
+.template-card-btn{width:100%;background:transparent;border:1px solid var(--border2);color:var(--muted2);font-family:'Syne',sans-serif;font-size:11px;font-weight:700;padding:7px;border-radius:5px;cursor:pointer;transition:all .15s;text-transform:uppercase;letter-spacing:.5px}
+.template-card-btn:hover{background:var(--accent);color:#000;border-color:var(--accent)}
+
+/* CREATE */
+#page-create{padding:28px 20px 80px;max-width:920px;margin:0 auto}
+.create-header{margin-bottom:24px}
+.create-header h1{font-family:'Bebas Neue',sans-serif;font-size:44px;letter-spacing:2px;margin-bottom:4px}
+.create-header p{color:var(--muted2);font-size:13px}
+.create-layout{display:grid;grid-template-columns:1fr 320px;gap:20px;align-items:start}
+@media(max-width:740px){.create-layout{grid-template-columns:1fr}}
+.section-label{font-size:10px;text-transform:uppercase;letter-spacing:2px;color:var(--muted);margin-bottom:8px;display:block}
+.field{margin-bottom:16px}
+.input{width:100%;background:var(--surface);border:1px solid var(--border2);border-radius:8px;padding:11px 14px;font-family:'Syne',sans-serif;font-size:14px;color:var(--text);outline:none;transition:border-color .2s}
+.input:focus{border-color:var(--accent)}
+.input::placeholder{color:var(--muted)}
+.input-title{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:2px;padding:12px 16px}
+.select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23555' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:34px;cursor:pointer}
+.tier-list{display:flex;flex-direction:column;gap:4px;margin-bottom:10px}
+.tier-row{display:flex;align-items:stretch;border-radius:7px;overflow:hidden;min-height:64px;border:1px solid transparent;transition:border-color .2s}
+.tier-row.drag-over{border-color:var(--accent)!important}
+.tier-label-wrap{width:60px;min-width:60px;display:flex;align-items:center;justify-content:center;position:relative;cursor:text}
+.tier-label-input{position:absolute;inset:0;background:transparent;border:none;font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px;text-align:center;width:100%;outline:none;cursor:text}
+.tier-items-area{flex:1;background:var(--surface);display:flex;flex-wrap:wrap;align-items:center;gap:5px;padding:7px 9px;min-height:64px}
+.tier-ctrl{width:36px;min-width:36px;background:var(--surface);border-left:1px solid var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+.tier-ctrl-btn{background:none;border:none;color:var(--muted);cursor:pointer;padding:3px 5px;border-radius:3px;font-size:12px;line-height:1;transition:all .15s}
+.tier-ctrl-btn:hover{color:var(--text);background:var(--border)}
+.tier-ctrl-btn.del:hover{color:var(--red)}
+.item-chip{display:flex;align-items:center;gap:4px;border-radius:5px;cursor:grab;user-select:none;transition:all .15s;border:1px solid var(--border2);background:var(--surface2)}
+.item-chip:hover{border-color:#3a3a3a;transform:translateY(-1px)}
+.item-chip:active{cursor:grabbing}
+.item-chip.dragging{opacity:.3}
+.item-chip.text-chip{padding:4px 9px;font-size:13px;font-weight:600}
+.item-chip.img-chip{padding:3px 7px 3px 3px}
+.item-img{width:28px;height:28px;border-radius:3px;object-fit:cover}
+.item-chip-label{font-size:11px;font-weight:600;max-width:75px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.item-del{color:var(--muted);cursor:pointer;font-size:10px;transition:color .15s;line-height:1;flex-shrink:0}
+.item-del:hover{color:var(--red)}
+.add-panel{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:14px}
+.add-tabs{display:flex;gap:4px;margin-bottom:12px}
+.add-tab{background:none;border:none;font-family:'Syne',sans-serif;font-size:11px;font-weight:700;color:var(--muted);padding:5px 11px;border-radius:5px;cursor:pointer;transition:all .15s;text-transform:uppercase;letter-spacing:.5px}
+.add-tab.active{background:rgba(232,255,60,.1);color:var(--accent)}
+.add-content{display:none}
+.add-content.active{display:block}
+.add-row{display:flex;gap:8px}
+.upload-area{border:2px dashed var(--border2);border-radius:8px;padding:18px;text-align:center;cursor:pointer;transition:all .2s;margin-bottom:10px}
+.upload-area:hover{border-color:var(--accent);background:rgba(232,255,60,.02)}
+.upload-area input{display:none}
+.upload-icon{font-size:24px;margin-bottom:5px}
+.upload-text{font-size:13px;color:var(--muted2)}
+.upload-sub{font-size:10px;color:var(--muted);margin-top:3px}
+.pool{display:flex;flex-wrap:wrap;gap:5px;min-height:50px;padding:9px;background:var(--surface2);border:1px dashed var(--border2);border-radius:7px;transition:all .2s;margin-bottom:14px}
+.pool.drag-over{border-color:var(--accent);border-style:solid}
+.pool-empty{color:var(--muted);font-size:12px;align-self:center}
+.sidebar-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:14px}
+.sidebar-card h3{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:1px;margin-bottom:4px}
+.sidebar-card p{font-size:12px;color:var(--muted2);line-height:1.5;margin-bottom:12px}
+.pro-card{background:linear-gradient(135deg,#1a1500,#120d00);border:1px solid #ffd70040;border-radius:10px;padding:18px;margin-bottom:14px}
+.pro-card h3{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1px;margin-bottom:4px;color:#ffd700}
+.pro-card p{font-size:12px;color:#9a8a60;line-height:1.5;margin-bottom:12px}
+.pro-features{list-style:none;margin-bottom:12px}
+.pro-features li{font-size:12px;color:#b89a40;padding:3px 0;display:flex;align-items:center;gap:6px}
+.pro-features li::before{content:'✦';color:#ffd700;font-size:9px}
+.preview-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:14px}
+.preview-card-header{padding:12px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.preview-card-header span{font-size:10px;text-transform:uppercase;letter-spacing:2px;color:var(--muted)}
+#render-area{background:#0d0d0d}
+.render-title-bar{padding:14px 18px 8px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #1a1a1a}
+.render-list-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;color:var(--accent)}
+.render-watermark{font-size:9px;color:#2a2a2a;letter-spacing:1px;text-transform:uppercase;font-family:'Syne',sans-serif}
+.render-tier{display:flex;border-bottom:1px solid #161616}
+.render-tier:last-child{border-bottom:none}
+.render-lbl{width:52px;min-width:52px;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:24px;min-height:50px;color:#000}
+.render-items{flex:1;display:flex;flex-wrap:wrap;gap:4px;padding:7px;align-items:center;background:#111}
+.render-chip{background:#1c1c1c;border:1px solid #242424;border-radius:3px}
+.render-chip.text{padding:3px 8px;font-size:11px;font-family:'Syne',sans-serif;color:#e0e0e0;font-weight:600}
+.render-chip.img{padding:2px 6px 2px 2px;display:flex;align-items:center;gap:4px}
+.render-chip-img{width:24px;height:24px;border-radius:2px;object-fit:cover}
+.render-chip-name{font-size:10px;font-family:'Syne',sans-serif;color:#ccc;font-weight:600}
+.render-empty{color:#2a2a2a;font-size:11px;padding:3px 6px;font-family:'Syne',sans-serif}
+
+/* MODALS */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.87);z-index:500;align-items:center;justify-content:center;backdrop-filter:blur(8px)}
+.modal-overlay.open{display:flex}
+.modal{background:var(--surface);border:1px solid var(--border2);border-radius:14px;width:min(440px,92vw);overflow:hidden;animation:modalIn .22s ease;position:relative}
+@keyframes modalIn{from{opacity:0;transform:scale(.95) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.modal-banner{background:linear-gradient(135deg,#1e1700,#150e00);padding:24px 24px 18px;border-bottom:1px solid #2a2000}
+.modal-banner h2{font-family:'Bebas Neue',sans-serif;font-size:34px;letter-spacing:2px;color:#ffd700;margin-bottom:4px}
+.modal-banner p{font-size:13px;color:#9a8a60;line-height:1.5}
+.modal-body{padding:22px 24px}
+.modal-features{list-style:none;margin-bottom:20px}
+.modal-features li{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px;color:var(--muted2)}
+.modal-features li:last-child{border-bottom:none}
+.feat-icon{font-size:16px;width:26px;text-align:center}
+.modal-price{display:flex;align-items:baseline;gap:6px;margin-bottom:18px}
+.modal-price .amount{font-family:'Bebas Neue',sans-serif;font-size:50px;letter-spacing:2px;line-height:1}
+.modal-price .per{font-size:13px;color:var(--muted2)}
+.modal-price .tag{background:var(--green);color:#000;font-size:9px;font-weight:800;padding:3px 7px;border-radius:4px;letter-spacing:1px;text-transform:uppercase}
+.modal-actions{display:flex;flex-direction:column;gap:8px}
+.modal-close{position:absolute;top:14px;right:14px;background:none;border:none;color:var(--muted);cursor:pointer;font-size:18px;line-height:1;padding:4px}
+.modal-close:hover{color:var(--text)}
+.pub-modal .modal-banner{background:linear-gradient(135deg,#0a1a0a,#061006);border-bottom:1px solid #1a2e1a}
+.pub-modal .modal-banner h2{color:var(--green)}
+.pub-modal .modal-banner p{color:#6a8a6a}
+.toast{position:fixed;bottom:22px;right:22px;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:11px 16px;font-size:13px;font-weight:600;z-index:1000;animation:toastIn .3s ease;display:flex;align-items:center;gap:8px}
+@keyframes toastIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:600px){
+  nav{padding:0 14px}.logo{font-size:22px}
+  .explore-hero,.explore-grid,.explore-filters{padding-left:16px;padding-right:16px}
+  .explore-grid{grid-template-columns:1fr}
+  #page-templates{padding:20px 14px 40px}
+  #page-create{padding:16px 12px 60px}
+  .nav-tab{font-size:11px;padding:6px 10px}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo" onclick="showPage('explore')">TIER<span>FORGE</span></div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showPage('explore')" id="tab-explore">Explore</button>
+    <button class="nav-tab" onclick="showPage('templates')" id="tab-templates">Templates</button>
+    <button class="nav-tab" onclick="showPage('create')" id="tab-create">Create</button>
+  </div>
+  <div class="nav-right">
+    <button class="btn btn-pro btn-sm" onclick="openPaywall()">✦ Pro — $3.99</button>
+  </div>
+</nav>
+
+<!-- EXPLORE -->
+<div class="page active" id="page-explore">
+  <div class="explore-hero">
+    <p class="hero-eyebrow">✦ Community Tier Lists</p>
+    <h1 class="hero-title">RANK<br><em>EVERYTHING.</em></h1>
+    <p class="hero-sub">Browse community tier lists, vote on the hottest takes, or pick from 60+ templates and start ranking.</p>
+    <div class="hero-actions">
+      <button class="btn btn-primary" onclick="showPage('templates')">Browse 60+ Templates</button>
+      <button class="btn btn-ghost" onclick="showPage('create')">＋ Create from Scratch</button>
+    </div>
+  </div>
+  <div class="explore-filters">
+    <button class="filter-chip active" onclick="filterCards('all',this)">All</button>
+    <button class="filter-chip" onclick="filterCards('nba',this)">🏀 NBA</button>
+    <button class="filter-chip" onclick="filterCards('nfl',this)">🏈 NFL</button>
+    <button class="filter-chip" onclick="filterCards('gaming',this)">🎮 Gaming</button>
+    <button class="filter-chip" onclick="filterCards('music',this)">🎵 Music</button>
+    <button class="filter-chip" onclick="filterCards('food',this)">🍕 Food</button>
+    <button class="filter-chip" onclick="filterCards('entertainment',this)">🎬 Entertainment</button>
+    <button class="filter-chip" onclick="filterCards('anime',this)">⛩️ Anime</button>
+    <button class="filter-chip" onclick="filterCards('sports',this)">⚽ Sports</button>
+  </div>
+  <div class="explore-grid" id="explore-grid"></div>
+</div>
+
+<!-- TEMPLATES -->
+<div class="page" id="page-templates">
+  <div class="templates-header">
+    <h1>Template Library</h1>
+    <p>60+ pre-loaded templates — pick one and all items load instantly. Just drag and rank.</p>
+  </div>
+  <input class="template-search" id="template-search" placeholder="Search: NBA, rappers, Marvel, fast food, anime…" oninput="searchTemplates(this.value)">
+  <div id="template-sections"></div>
+</div>
+
+<!-- CREATE -->
+<div class="page" id="page-create">
+  <div class="create-header">
+    <h1>Create Tier List</h1>
+    <p>Drag items into tiers, upload images, then download or publish to the community.</p>
+  </div>
+  <div class="create-layout">
+    <div class="create-main">
+      <div class="field">
+        <span class="section-label">List Title</span>
+        <input class="input input-title" id="list-title" placeholder="MY TIER LIST" maxlength="60" oninput="updateRender()">
+      </div>
+      <div class="field">
+        <span class="section-label">Category</span>
+        <select class="input select" id="list-category">
+          <option value="nba">🏀 NBA</option>
+          <option value="nfl">🏈 NFL</option>
+          <option value="gaming">🎮 Gaming</option>
+          <option value="music">🎵 Music</option>
+          <option value="food">🍕 Food</option>
+          <option value="entertainment">🎬 Entertainment</option>
+          <option value="anime">⛩️ Anime</option>
+          <option value="sports">⚽ Sports</option>
+          <option value="other">✦ Other</option>
+        </select>
+      </div>
+      <span class="section-label">Tiers</span>
+      <div class="tier-list" id="tier-list"></div>
+      <button class="btn btn-ghost btn-sm" onclick="addTier()" style="margin-bottom:16px">＋ Add Tier</button>
+      <div class="add-panel">
+        <div class="add-tabs">
+          <button class="add-tab active" onclick="switchAddTab('text',this)">Text Items</button>
+          <button class="add-tab" onclick="switchAddTab('image',this)">Image Upload</button>
+        </div>
+        <div class="add-content active" id="add-text">
+          <div class="add-row">
+            <input class="input" id="text-input" placeholder="Type item name…" maxlength="40" onkeydown="if(event.key==='Enter')addTextItem()">
+            <button class="btn btn-primary" onclick="addTextItem()">Add</button>
+          </div>
+        </div>
+        <div class="add-content" id="add-image">
+          <div class="upload-area" onclick="document.getElementById('img-upload').click()">
+            <input type="file" id="img-upload" accept="image/*" multiple onchange="handleImageUpload(this)">
+            <div class="upload-icon">🖼️</div>
+            <div class="upload-text">Click to upload images</div>
+            <div class="upload-sub">PNG, JPG, GIF • Multiple files supported</div>
+          </div>
+          <div class="add-row">
+            <input class="input" id="img-label" placeholder="Label for image (optional)" maxlength="30">
+          </div>
+        </div>
+      </div>
+      <span class="section-label">Unranked Items — drag into tiers above</span>
+      <div class="pool" id="pool"
+        ondragover="onDragOver(event,'__pool__')"
+        ondrop="onDrop(event,'__pool__')"
+        ondragleave="onDragLeave()">
+        <span class="pool-empty">Add items above, then drag them into tiers</span>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px">
+        <button class="btn btn-primary" onclick="openPublish()">🌍 Publish to Explore</button>
+        <button class="btn btn-ghost" onclick="resetCreate()">Reset</button>
+      </div>
+    </div>
+    <div class="create-sidebar">
+      <div class="pro-card">
+        <h3>✦ Go Pro</h3>
+        <p>One-time $3.99 — remove watermark forever.</p>
+        <ul class="pro-features">
+          <li>No watermark on downloads</li>
+          <li>4K high-resolution exports</li>
+          <li>Custom tier colors</li>
+          <li>Unlimited image uploads</li>
+        </ul>
+        <button class="btn btn-pro" style="width:100%" onclick="openPaywall()">Unlock for $3.99</button>
+      </div>
+      <div class="sidebar-card">
+        <h3>Download PNG</h3>
+        <p>Save and share on TikTok, Twitter, Reddit.</p>
+        <button class="btn btn-primary" style="width:100%;margin-bottom:7px" onclick="downloadImage()">⬇ Download PNG</button>
+        <p style="font-size:11px;color:var(--muted);text-align:center">Watermark included · <span style="color:var(--accent);cursor:pointer" onclick="openPaywall()">Remove for $3.99</span></p>
+      </div>
+      <div class="preview-card">
+        <div class="preview-card-header">
+          <span>Live Preview</span>
+          <span style="font-size:10px;color:var(--muted)">Auto-updates</span>
+        </div>
+        <div id="render-area">
+          <div class="render-title-bar">
+            <div class="render-list-title" id="render-title">MY TIER LIST</div>
+            <div class="render-watermark" id="wm-text">TIERFORGE.IO</div>
+          </div>
+          <div id="render-tiers"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PAYWALL MODAL -->
+<div class="modal-overlay" id="paywall-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('paywall-modal')">✕</button>
+    <div class="modal-banner">
+      <h2>✦ TIERFORGE PRO</h2>
+      <p>One-time payment. No subscription. Yours forever.</p>
+    </div>
+    <div class="modal-body">
+      <ul class="modal-features">
+        <li><span class="feat-icon">🚫</span>No watermark on downloads</li>
+        <li><span class="feat-icon">📸</span>4K high-resolution exports</li>
+        <li><span class="feat-icon">🎨</span>Custom tier colors</li>
+        <li><span class="feat-icon">🖼️</span>Unlimited image uploads</li>
+        <li><span class="feat-icon">📌</span>Pin & feature your lists</li>
+      </ul>
+      <div class="modal-price">
+        <div class="amount">$3.99</div>
+        <div class="per">one-time</div>
+        <div class="tag">Best Value</div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-pro" style="width:100%;padding:13px;font-size:14px" onclick="simulatePurchase()">✦ Unlock Pro Now</button>
+        <button class="btn btn-ghost" style="width:100%" onclick="closeModal('paywall-modal')">Maybe Later</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PUBLISH MODAL -->
+<div class="modal-overlay" id="publish-modal">
+  <div class="modal pub-modal">
+    <button class="modal-close" onclick="closeModal('publish-modal')">✕</button>
+    <div class="modal-banner">
+      <h2>🌍 PUBLISH LIST</h2>
+      <p>Share your tier list with the TierForge community.</p>
+    </div>
+    <div class="modal-body">
+      <div class="field">
+        <span class="section-label">Username</span>
+        <input class="input" id="pub-author" placeholder="Anonymous" maxlength="30">
+      </div>
+      <div class="field" style="margin-top:10px">
+        <span class="section-label">Hot Take (optional)</span>
+        <input class="input" id="pub-desc" placeholder="Change my mind…" maxlength="100">
+      </div>
+      <div class="modal-actions" style="margin-top:16px">
+        <button class="btn btn-primary" style="width:100%;padding:12px" onclick="publishList()">Publish to Explore ↗</button>
+        <button class="btn btn-ghost" style="width:100%" onclick="closeModal('publish-modal')">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════
+// TEMPLATE LIBRARY — 60+ templates
+// ══════════════════════════════════════════════════════
+const TEMPLATE_LIBRARY = {
+  '🏀 NBA':[
+    {name:'NBA Teams 2024-25',emoji:'🏀',cat:'nba',items:['Celtics','Thunder','Nuggets','Knicks','Timberwolves','Cavaliers','Pacers','Heat','Warriors','Suns','Lakers','Clippers','Nets','Bucks','76ers','Pelicans','Mavericks','Grizzlies','Hawks','Bulls','Raptors','Spurs','Rockets','Jazz','Kings','Magic','Pistons','Hornets','Wizards','Trail Blazers']},
+    {name:'NBA GOATs All Time',emoji:'👑',cat:'nba',items:['Michael Jordan','LeBron James','Kobe Bryant','Shaquille O\'Neal','Magic Johnson','Larry Bird','Kareem Abdul-Jabbar','Tim Duncan','Kevin Durant','Stephen Curry','Giannis Antetokounmpo','Hakeem Olajuwon','Charles Barkley','Dirk Nowitzki','Nikola Jokic','Wilt Chamberlain','Oscar Robertson','Bill Russell','Scottie Pippen','Dwyane Wade']},
+    {name:'NBA Point Guards',emoji:'🏃',cat:'nba',items:['Stephen Curry','Magic Johnson','Chris Paul','Isiah Thomas','John Stockton','Allen Iverson','Jason Kidd','Gary Payton','Steve Nash','Kyrie Irving','Damian Lillard','Russell Westbrook','Rajon Rondo','Luka Doncic','Trae Young','Ja Morant','Tyrese Haliburton','De\'Aaron Fox','Fred VanVleet','Mike Conley']},
+    {name:'NBA Centers',emoji:'🏛️',cat:'nba',items:['Wilt Chamberlain','Bill Russell','Kareem Abdul-Jabbar','Shaquille O\'Neal','Hakeem Olajuwon','Patrick Ewing','David Robinson','Nikola Jokic','Joel Embiid','Karl-Anthony Towns','Rudy Gobert','Bam Adebayo','Deandre Ayton','Clint Capela','Brook Lopez','Myles Turner','Anthony Davis','Victor Wembanyama','Chet Holmgren']},
+  ],
+  '🏈 NFL':[
+    {name:'NFL Teams 2024',emoji:'🏈',cat:'nfl',items:['Chiefs','49ers','Cowboys','Eagles','Ravens','Bills','Dolphins','Bengals','Jaguars','Titans','Colts','Texans','Steelers','Browns','Raiders','Chargers','Broncos','Seahawks','Rams','Cardinals','Packers','Bears','Lions','Vikings','Saints','Buccaneers','Panthers','Falcons','Giants','Commanders','Jets','Patriots']},
+    {name:'NFL QBs All Time',emoji:'🏆',cat:'nfl',items:['Tom Brady','Joe Montana','Peyton Manning','John Elway','Dan Marino','Patrick Mahomes','Aaron Rodgers','Drew Brees','Brett Favre','Steve Young','Lamar Jackson','Josh Allen','Joe Burrow','Justin Herbert','Johnny Unitas','Terry Bradshaw','Roger Staubach','Troy Aikman','Eli Manning','Ben Roethlisberger']},
+    {name:'NFL Wide Receivers',emoji:'⚡',cat:'nfl',items:['Jerry Rice','Randy Moss','Terrell Owens','Calvin Johnson','Cris Carter','Michael Irvin','Justin Jefferson','Davante Adams','Tyreek Hill','Stefon Diggs','DeAndre Hopkins','Larry Fitzgerald','Antonio Brown','Julio Jones','Odell Beckham Jr.','Mike Evans','Ja\'Marr Chase','CeeDee Lamb','A.J. Brown','Amon-Ra St. Brown']},
+    {name:'NFL Running Backs',emoji:'💪',cat:'nfl',items:['Jim Brown','Walter Payton','Barry Sanders','Emmitt Smith','Eric Dickerson','Earl Campbell','Adrian Peterson','LaDainian Tomlinson','Marshall Faulk','Christian McCaffrey','Derrick Henry','Alvin Kamara','Saquon Barkley','Nick Chubb','Dalvin Cook','Ezekiel Elliott','Josh Jacobs','Bijan Robinson','Breece Hall','De\'Von Achane']},
+    {name:'NFL Defensive Players',emoji:'🛡️',cat:'nfl',items:['Lawrence Taylor','Reggie White','Deion Sanders','Dick Butkus','Mean Joe Greene','Ray Lewis','Ed Reed','Ronnie Lott','Rod Woodson','Derrick Thomas','Bruce Smith','Myles Garrett','T.J. Watt','Micah Parsons','Nick Bosa','Jalen Ramsey','Stephon Gilmore','Sauce Gardner','Devon Witherspoon']},
+  ],
+  '🎵 Music':[
+    {name:'Greatest Rappers Ever',emoji:'🎤',cat:'music',items:['Kendrick Lamar','Jay-Z','Nas','Eminem','Lil Wayne','André 3000','Rakim','Biggie','Tupac','J. Cole','Drake','Kanye West','Big Pun','Scarface','Ice Cube','Ghostface Killah','MF DOOM','Big L','Royce da 5\'9"','Lil Baby','21 Savage','Gunna','Pusha T','Tyler the Creator','Joey Bada$$']},
+    {name:'Drake Albums',emoji:'🦉',cat:'music',items:['Take Care','Nothing Was the Same','If You\'re Reading This','Views','Scorpion','Certified Lover Boy','Honestly Nevermind','Her Loss','Thank Me Later','So Far Gone','More Life','Scary Hours']},
+    {name:'Kendrick Discography',emoji:'🎶',cat:'music',items:['To Pimp a Butterfly','DAMN.','Good Kid m.A.A.d City','Mr. Morale & The Big Steppers','Section.80','Overly Dedicated','Untitled Unmastered','GNX']},
+    {name:'Kanye Albums',emoji:'🎹',cat:'music',items:['The College Dropout','Late Registration','Graduation','808s & Heartbreak','My Beautiful Dark Twisted Fantasy','Watch the Throne','Yeezus','The Life of Pablo','ye','Kids See Ghosts','Donda','Vultures 1','Vultures 2']},
+    {name:'Taylor Swift Albums',emoji:'✨',cat:'music',items:['Midnights','Folklore','Evermore','1989 (TV)','Reputation','Lover','Red (TV)','Speak Now (TV)','Fearless (TV)','Taylor Swift','The Tortured Poets Department']},
+    {name:'Pop Stars Ranked',emoji:'⭐',cat:'music',items:['Beyoncé','Taylor Swift','Rihanna','Ariana Grande','Dua Lipa','Billie Eilish','Lady Gaga','Selena Gomez','Katy Perry','Nicki Minaj','Cardi B','Olivia Rodrigo','Sabrina Carpenter','Doja Cat','SZA','Chappell Roan','Gracie Abrams','Charli xcx','Addison Rae','Victoria Monét']},
+    {name:'Rock Bands All Time',emoji:'🎸',cat:'music',items:['The Beatles','Led Zeppelin','Pink Floyd','The Rolling Stones','Queen','Nirvana','Radiohead','The Doors','Jimi Hendrix Experience','AC/DC','Metallica','Guns N\' Roses','Foo Fighters','Red Hot Chili Peppers','Green Day','Blink-182','Arctic Monkeys','Twenty One Pilots','Imagine Dragons','Linkin Park']},
+  ],
+  '🎮 Gaming':[
+    {name:'PlayStation Exclusives',emoji:'🎮',cat:'gaming',items:['God of War Ragnarök','The Last of Us Part II','Horizon Forbidden West','Spider-Man 2','Bloodborne','Demon\'s Souls','Returnal','Ghost of Tsushima','Uncharted 4','Astro Bot','Gran Turismo 7','Ratchet & Clank','Death Stranding','Days Gone']},
+    {name:'Call of Duty Games',emoji:'🔫',cat:'gaming',items:['Modern Warfare 2 (2022)','Modern Warfare (2019)','Black Ops II','MW2 (2009)','Black Ops','World at War','Cold War','Black Ops III','Warzone','Vanguard','Infinite Warfare','Advanced Warfare','Ghosts','MW3 (2023)','MW3 (2011)']},
+    {name:'Soulsborne Ranked',emoji:'⚔️',cat:'gaming',items:['Elden Ring','Dark Souls III','Bloodborne','Dark Souls','Sekiro','Dark Souls II','Demon\'s Souls Remake','Lies of P','Lords of the Fallen','Nioh 2','Wo Long','Star Wars Jedi: Survivor']},
+    {name:'Nintendo Switch Games',emoji:'🕹️',cat:'gaming',items:['Tears of the Kingdom','Breath of the Wild','Mario Kart 8 Deluxe','Smash Bros Ultimate','Metroid Dread','Fire Emblem: Three Houses','Xenoblade 3','Splatoon 3','Mario Odyssey','Animal Crossing','Kirby Forgotten Land','Bayonetta 3','Pokémon SV']},
+    {name:'Battle Royale Games',emoji:'🏆',cat:'gaming',items:['Fortnite','Apex Legends','PUBG','Warzone','Fall Guys','The Finals','Naraka Bladepoint','Spellbreak','Squads','Hyper Scape']},
+    {name:'Open World RPGs',emoji:'🗺️',cat:'gaming',items:['Elden Ring','Skyrim','The Witcher 3','Cyberpunk 2077','Red Dead 2','GTA V','Baldur\'s Gate 3','Mass Effect 2','Fallout New Vegas','Horizon Zero Dawn','Final Fantasy XVI','Starfield','Dragon\'s Dogma 2','Avowed']},
+    {name:'Fighting Games',emoji:'🥊',cat:'gaming',items:['Street Fighter 6','Tekken 8','Mortal Kombat 1','Dragon Ball FighterZ','Guilty Gear Strive','Granblue Fantasy Versus','MultiVersus','Brawlhalla','Soul Calibur VI','Marvel vs Capcom 3','Smash Bros Ultimate','Injustice 2']},
+  ],
+  '🎬 Entertainment':[
+    {name:'Hottest Actresses 2024',emoji:'💫',cat:'entertainment',items:['Margot Robbie','Zendaya','Sydney Sweeney','Ana de Armas','Florence Pugh','Anya Taylor-Joy','Jenna Ortega','Rachel Zegler','Hunter Schafer','Joey King','Lily James','Emma Stone','Scarlett Johansson','Jennifer Lawrence','Megan Fox','Salma Hayek','Priyanka Chopra','Eva Mendes','Dua Lipa','Sabrina Carpenter']},
+    {name:'Marvel Movies',emoji:'🦸',cat:'entertainment',items:['Avengers: Endgame','Infinity War','Iron Man','Civil War','Thor: Ragnarok','Guardians of the Galaxy','Black Panther','No Way Home','Doctor Strange MVM','Shang-Chi','Eternals','Thor: Love and Thunder','Black Widow','Ant-Man','The Marvels']},
+    {name:'DC Movies',emoji:'🦇',cat:'entertainment',items:['The Dark Knight','Batman Begins','The Dark Knight Rises','Man of Steel','Wonder Woman','Joker','The Batman','Aquaman','Shazam!','Black Adam','The Flash','Blue Beetle','Superman (2025)','Suicide Squad']},
+    {name:'Netflix Series',emoji:'📺',cat:'entertainment',items:['Squid Game','Stranger Things','Ozark','The Crown','Wednesday','Narcos','Money Heist','Breaking Bad','Better Call Saul','Peaky Blinders','The Witcher','Dark','Lupin','You','Bridgerton','Umbrella Academy','Squid Game S2']},
+    {name:'Best Actors Hollywood',emoji:'🎭',cat:'entertainment',items:['Leonardo DiCaprio','Tom Hanks','Denzel Washington','Joaquin Phoenix','Morgan Freeman','Brad Pitt','Tom Cruise','Robert De Niro','Al Pacino','Anthony Hopkins','Cillian Murphy','Austin Butler','Paul Mescal','Ryan Gosling','Timothée Chalamet','Pedro Pascal','Glen Powell','Miles Teller','Barry Keoghan','Jacob Elordi']},
+    {name:'Reality TV Shows',emoji:'📸',cat:'entertainment',items:['Love Island','Survivor','The Bachelor','Real Housewives','Jersey Shore','Too Hot to Handle','Love is Blind','The Circle','Married at First Sight','90 Day Fiancé','The Challenge','RuPaul\'s Drag Race','Big Brother','The Traitors','Love & Hip Hop','Below Deck','Summer House','Vanderpump Rules']},
+    {name:'Best Movies 2020s',emoji:'🎬',cat:'entertainment',items:['Oppenheimer','Barbie','Everything Everywhere','The Batman','Dune','Dune Part Two','Top Gun: Maverick','Avatar 2','Black Panther Wakanda','Spider-Man NWH','Tár','Past Lives','All Quiet on the Western Front','CODA','Belfast','Parasite','Nomadland','The Power of the Dog']},
+  ],
+  '⛩️ Anime':[
+    {name:'Best Anime Series',emoji:'⛩️',cat:'anime',items:['Attack on Titan','Fullmetal Alchemist: Brotherhood','Hunter x Hunter','Demon Slayer','Jujutsu Kaisen','Vinland Saga','One Punch Man','Mob Psycho 100','Spy x Family','Chainsaw Man','Oshi no Ko','Blue Lock','Frieren','Hell\'s Paradise','Dragon Ball Z','One Piece','Naruto Shippuden','Bleach: TYBW','Code Geass','Death Note']},
+    {name:'Anime Villains',emoji:'😈',cat:'anime',items:['Meruem','Aizen','Madara','Griffith','Johan Liebert','Light Yagami','Dio Brando','Frieza','Pain','Itachi','Muzan','Sukuna','Makima','Doflamingo','Yhwach','Shogo Makishima','Gendo Ikari','Overhaul','Shigaraki','All For One']},
+    {name:'Anime Openings',emoji:'🎵',cat:'anime',items:['Unravel (Tokyo Ghoul)','Guren no Yumiya (AOT)','Gurenge (Demon Slayer)','Blue Bird (Naruto)','Again (FMA:B)','Tank! (Cowboy Bebop)','Cruel Angel\'s Thesis (Eva)','Odd Future (MHA)','Kaikai Kitan (JJK)','Silhouette (Naruto)','Inferno (Fire Force)','The Hero (OPM)','Fly High (Haikyuu)','Haruka Kanata (Naruto)','Redo (Re:Zero)']},
+    {name:'Shonen Protagonists',emoji:'⚡',cat:'anime',items:['Gon Freecss','Edward Elric','Naruto Uzumaki','Ichigo Kurosaki','Monkey D. Luffy','Goku','Tanjiro Kamado','Yuji Itadori','Deku','Asta','Yusuke Urameshi','Saitama','Mob','Itadori','Shinra Kusakabe','Denji','Rudeus Greyrat','Rimuru Tempest','Arata Kasuga']},
+  ],
+  '🍕 Food & Drink':[
+    {name:'Fast Food Chains',emoji:'🍔',cat:'food',items:['Chick-fil-A','In-N-Out','Five Guys','Shake Shack','Whataburger','Culver\'s','Raising Cane\'s','Popeyes','Wingstop','Chipotle','McDonald\'s','Burger King','Wendy\'s','Taco Bell','KFC','Subway','Panda Express','Sonic','Dairy Queen','Zaxby\'s','Cook Out','Freddy\'s','Steak \'n Shake']},
+    {name:'Pizza Toppings',emoji:'🍕',cat:'food',items:['Pepperoni','Mozzarella','Mushrooms','Basil','Italian Sausage','Onions','Bell Peppers','Black Olives','Jalapeños','Bacon','Chicken','Spinach','Sun-Dried Tomatoes','Anchovies','Pineapple','Roasted Garlic','Ricotta','Prosciutto','Artichoke Hearts','Banana Peppers']},
+    {name:'Sodas & Drinks',emoji:'🥤',cat:'food',items:['Coke','Pepsi','Dr Pepper','Mountain Dew','Sprite','Fanta Orange','Root Beer','Ginger Ale','Orange Crush','Grape Soda','Monster Energy','Red Bull','Prime','Gatorade','Powerade','Lemonade','Sweet Tea','Boba Tea','Coffee','Sparkling Water']},
+    {name:'Chips & Snacks',emoji:'🥨',cat:'food',items:['Doritos Nacho Cheese','Takis Fuego','Flamin\' Hot Cheetos','Original Lays','Pringles Sour Cream','Ruffles Cheddar','Funyuns','Corn Nuts','Goldfish','Cheez-Its','Fritos','Bugles','Cool Ranch Doritos','Sun Chips','Skinny Pop','Quest Chips','Zapp\'s','Utz','Chester\'s Puffcorn','Smartfood Popcorn']},
+    {name:'Ice Cream Flavors',emoji:'🍦',cat:'food',items:['Cookies and Cream','Cookie Dough','Mint Choc Chip','Rocky Road','Birthday Cake','Chocolate','Vanilla','Strawberry','Butter Pecan','Neapolitan','Pralines & Cream','Pistachio','Coffee','Caramel Swirl','Mango','Matcha','Cherry Garcia','Phish Food','Americone Dream','Half Baked']},
+    {name:'Coffee Drinks',emoji:'☕',cat:'food',items:['Espresso','Cappuccino','Latte','Americano','Cold Brew','Nitro Cold Brew','Flat White','Macchiato','Mocha','Cortado','Oat Milk Latte','Iced Coffee','Frappuccino','Pour Over','Drip Coffee','Ristretto','Lungo','Affogato','Matcha Latte','Chai Latte']},
+  ],
+  '⚽ Sports':[
+    {name:'Soccer/Football GOATs',emoji:'⚽',cat:'sports',items:['Lionel Messi','Cristiano Ronaldo','Pelé','Diego Maradona','Johan Cruyff','Ronaldo (R9)','Zinedine Zidane','Ronaldinho','Thierry Henry','Marco van Basten','Kylian Mbappé','Erling Haaland','Neymar','Vinicius Jr.','Lamine Yamal','Phil Foden','Jude Bellingham','Pedri','Gavi','Rodri']},
+    {name:'Premier League Clubs',emoji:'🏟️',cat:'sports',items:['Manchester City','Arsenal','Liverpool','Chelsea','Tottenham','Manchester United','Newcastle','Aston Villa','Brighton','West Ham','Brentford','Fulham','Crystal Palace','Wolves','Bournemouth','Nottingham Forest','Everton','Ipswich','Leicester','Southampton']},
+    {name:'MMA Fighters GOAT',emoji:'🥊',cat:'sports',items:['Jon Jones','Georges St-Pierre','Khabib Nurmagomedov','Anderson Silva','Demetrious Johnson','Amanda Nunes','Stipe Miocic','Daniel Cormier','Conor McGregor','Israel Adesanya','Alex Pereira','Francis Ngannou','Valentina Shevchenko','Ronda Rousey','Chuck Liddell','Randy Couture','Alistair Overeem','Nate Diaz','Dustin Poirier','Max Holloway']},
+    {name:'Tennis GOATs',emoji:'🎾',cat:'sports',items:['Novak Djokovic','Rafael Nadal','Roger Federer','Pete Sampras','Andre Agassi','Serena Williams','Steffi Graf','Martina Navratilova','Carlos Alcaraz','Jannik Sinner','Iga Swiatek','Coco Gauff','Aryna Sabalenka','Naomi Osaka','Monica Seles','Venus Williams','Andy Murray','Boris Becker','Ivan Lendl','Lleyton Hewitt']},
+    {name:'NBA vs NFL vs MLB',emoji:'🏆',cat:'sports',items:['Patrick Mahomes','LeBron James','Mike Trout','Shohei Ohtani','Stephen Curry','Josh Allen','Giannis','Aaron Judge','Lamar Jackson','Nikola Jokic','Justin Herbert','Freddie Freeman','Tua Tagovailoa','Jayson Tatum','Juan Soto','Mookie Betts','Joe Burrow','Luka Doncic','Tyreek Hill','Ronald Acuña Jr.']},
+  ],
+};
+
+// ══════════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════════
+const TIER_DEFAULTS=['S','A','B','C','D','F'];
+const TIER_COLORS={S:'#ff4545',A:'#ff8c42',B:'#ffd700',C:'#6fff6e',D:'#4eb8ff',E:'#c084ff',F:'#ff5cae'};
+const FALLBACK='#777777';
+const CAT_COLORS={nba:'#ff8c42',nfl:'#4eb8ff',gaming:'#6fff6e',music:'#c084ff',food:'#ff8c42',entertainment:'#ff5cae',anime:'#ffd700',sports:'#6fff6e',other:'#888'};
+const CAT_EMOJI={nba:'🏀',nfl:'🏈',gaming:'🎮',music:'🎵',food:'🍕',entertainment:'🎬',anime:'⛩️',sports:'⚽',other:'✦'};
+
+let tiers={},tierOrder=[],pool=[],isPro=false,dragItem=null,communityLists=[];
+let _id=0;const uid=()=>'i'+(++_id);
+
+// ══════════════════════════════════════════════════════
+// SEED COMMUNITY
+// ══════════════════════════════════════════════════════
+const SEED=[
+  {id:1,title:'NBA GOAT RANKINGS',category:'nba',author:'HoopHead23',votes:3241,trending:true,tiers:[{label:'S',color:'#ff4545',items:['MJ','LeBron','Kobe']},{label:'A',color:'#ff8c42',items:['Magic','Bird','Shaq']},{label:'B',color:'#ffd700',items:['KD','Curry','Giannis']},{label:'C',color:'#6fff6e',items:['Harden']},{label:'F',color:'#ff5cae',items:['Westbrook']}]},
+  {id:2,title:'NFL QBS THIS SEASON',category:'nfl',author:'TouchdownKing',votes:2187,trending:true,tiers:[{label:'S',color:'#ff4545',items:['Mahomes','Lamar']},{label:'A',color:'#ff8c42',items:['Josh Allen','Burrow']},{label:'B',color:'#ffd700',items:['Dak','Hurts']},{label:'D',color:'#4eb8ff',items:['Goff','Herbert']},{label:'F',color:'#ff5cae',items:['Fields']}]},
+  {id:3,title:'HOTTEST ACTRESSES 2024',category:'entertainment',author:'HollywoodFan',votes:8942,trending:true,tiers:[{label:'S',color:'#ff4545',items:['Margot Robbie','Zendaya','Sydney Sweeney']},{label:'A',color:'#ff8c42',items:['Ana de Armas','Florence Pugh']},{label:'B',color:'#ffd700',items:['Anya Taylor-Joy','Jenna Ortega']},{label:'C',color:'#6fff6e',items:['Joey King','Lily James']}]},
+  {id:4,title:'GREATEST RAPPERS EVER',category:'music',author:'HipHopScholar',votes:5632,trending:true,tiers:[{label:'S',color:'#ff4545',items:['Kendrick','Nas','Jay-Z']},{label:'A',color:'#ff8c42',items:['Eminem','André 3K','Biggie','Tupac']},{label:'B',color:'#ffd700',items:['Lil Wayne','Drake','J. Cole']},{label:'F',color:'#ff5cae',items:['Lil Pump','6ix9ine']}]},
+  {id:5,title:'FAST FOOD TIER LIST',category:'food',author:'FoodieGod',votes:4401,tiers:[{label:'S',color:'#ff4545',items:['Chick-fil-A','In-N-Out']},{label:'A',color:'#ff8c42',items:['Five Guys','Raising Cane\'s','Wingstop']},{label:'B',color:'#ffd700',items:['Chipotle','Popeyes','Shake Shack']},{label:'C',color:'#6fff6e',items:['McDonald\'s','Wendy\'s']},{label:'F',color:'#ff5cae',items:['Subway']}]},
+  {id:6,title:'BEST ANIME 2024',category:'anime',author:'OtakuElite',votes:2993,tiers:[{label:'S',color:'#ff4545',items:['Frieren','JJK S2']},{label:'A',color:'#ff8c42',items:['Demon Slayer S4','Blue Lock S2']},{label:'B',color:'#ffd700',items:['Bleach TYBW','Oshi no Ko S2']},{label:'C',color:'#6fff6e',items:['One Piece Egghead']}]},
+  {id:7,title:'SOULSBORNE RANKED',category:'gaming',author:'DarkLord99',votes:1882,tiers:[{label:'S',color:'#ff4545',items:['Elden Ring','Bloodborne','DS3']},{label:'A',color:'#ff8c42',items:['Sekiro','DS1']},{label:'B',color:'#ffd700',items:['DS2','Lies of P']},{label:'F',color:'#ff5cae',items:['The Surge']}]},
+  {id:8,title:'MARVEL MOVIES RANKED',category:'entertainment',author:'MCUFan',votes:3102,tiers:[{label:'S',color:'#ff4545',items:['Endgame','Infinity War','Iron Man']},{label:'A',color:'#ff8c42',items:['Civil War','Ragnarok','No Way Home']},{label:'B',color:'#ffd700',items:['Black Panther','Guardians']},{label:'F',color:'#ff5cae',items:['Eternals','Thor 4','The Marvels']}]},
+  {id:9,title:'SOCCER GOATS',category:'sports',author:'FootballFanatic',votes:4521,trending:true,tiers:[{label:'S',color:'#ff4545',items:['Messi','Ronaldo','Pelé']},{label:'A',color:'#ff8c42',items:['Maradona','Cruyff','Zidane']},{label:'B',color:'#ffd700',items:['Ronaldinho','Henry','Mbappé']},{label:'C',color:'#6fff6e',items:['Neymar','Haaland']}]},
+  {id:10,title:'CALL OF DUTY RANKED',category:'gaming',author:'XxProGamerxX',votes:1654,tiers:[{label:'S',color:'#ff4545',items:['MW2 (2009)','Black Ops II']},{label:'A',color:'#ff8c42',items:['Black Ops','MW (2019)','World at War']},{label:'B',color:'#ffd700',items:['Cold War','MW2 (2022)']},{label:'F',color:'#ff5cae',items:['Vanguard','Infinite Warfare']}]},
+];
+
+function initCommunity(){communityLists=SEED.map(l=>({...l,userVoted:false}));}
+
+// ══════════════════════════════════════════════════════
+// NAV
+// ══════════════════════════════════════════════════════
+function showPage(name){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  document.getElementById('tab-'+name).classList.add('active');
+  if(name==='explore')renderExplore('all');
+  if(name==='templates')renderTemplates();
+}
+
+// ══════════════════════════════════════════════════════
+// EXPLORE
+// ══════════════════════════════════════════════════════
+function filterCards(cat,btn){
+  document.querySelectorAll('.filter-chip').forEach(c=>c.classList.remove('active'));
+  btn.classList.add('active');
+  renderExplore(cat);
+}
+function renderExplore(cat){
+  const grid=document.getElementById('explore-grid');
+  const lists=cat==='all'?communityLists:communityLists.filter(l=>l.category===cat);
+  grid.innerHTML='';
+  [...lists].sort((a,b)=>b.votes-a.votes).forEach((list,i)=>{
+    const card=makeCard(list,i);grid.appendChild(card);
+  });
+}
+function makeCard(list,idx){
+  const div=document.createElement('div');
+  div.className='list-card';div.style.animationDelay=(idx*.04)+'s';
+  const color=CAT_COLORS[list.category]||'#888';
+  const emoji=CAT_EMOJI[list.category]||'✦';
+  const tiersHTML=list.tiers.slice(0,4).map(t=>`
+    <div class="mini-tier">
+      <div class="mini-label" style="background:${t.color};color:${getTC(t.color)}">${t.label}</div>
+      <div class="mini-items">${t.items.slice(0,5).map(i=>`<span class="mini-item-text">${i}</span>`).join('')}</div>
+    </div>`).join('');
+  div.innerHTML=`
+    ${list.trending?'<div class="trending-badge">🔥 Hot</div>':''}
+    <div class="list-card-header">
+      <div class="list-card-title">${list.title}</div>
+      <span class="list-card-tag" style="background:${color}22;color:${color}">${emoji}</span>
+    </div>
+    <div class="list-card-tiers">${tiersHTML}</div>
+    <div class="list-card-footer">
+      <span class="card-meta">by <b>${list.author}</b></span>
+      <div class="card-votes">
+        <button class="vote-btn ${list.userVoted?'voted':''}" onclick="vote(event,${list.id})">▲</button>
+        <span id="votes-${list.id}">${list.votes.toLocaleString()}</span>
+      </div>
+    </div>`;
+  div.onclick=e=>{if(e.target.classList.contains('vote-btn'))return;remixList(list);};
+  return div;
+}
+function vote(e,id){
+  e.stopPropagation();
+  const list=communityLists.find(l=>l.id===id);if(!list)return;
+  list.userVoted=!list.userVoted;list.votes+=list.userVoted?1:-1;
+  e.target.classList.toggle('voted',list.userVoted);
+  document.getElementById('votes-'+id).textContent=list.votes.toLocaleString();
+}
+function remixList(list){
+  // Show detail modal instead of confirm()
+  const modal = document.getElementById('remix-modal');
+  document.getElementById('remix-title').textContent = list.title;
+  document.getElementById('remix-author').textContent = 'by ' + list.author;
+  document.getElementById('remix-votes').textContent = list.votes.toLocaleString() + ' votes';
+  // Render full tier preview inside modal
+  const preview = document.getElementById('remix-preview');
+  preview.innerHTML = '';
+  list.tiers.forEach(t => {
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;gap:6px;margin-bottom:4px;';
+    row.innerHTML = `
+      <div style="width:36px;min-width:36px;height:32px;display:flex;align-items:center;justify-content:center;background:${t.color};color:${getTC(t.color)};font-family:'Bebas Neue',sans-serif;font-size:18px;border-radius:4px;">${t.label}</div>
+      <div style="display:flex;gap:4px;flex-wrap:wrap;flex:1;background:#181818;padding:4px 8px;border-radius:4px;min-height:32px;align-items:center;">
+        ${t.items.map(i=>`<span style="font-size:12px;background:#242424;border-radius:3px;padding:2px 7px;color:#ccc;">${i}</span>`).join('')}
+      </div>`;
+    preview.appendChild(row);
+  });
+  // Store list on button for use on confirm
+  document.getElementById('remix-confirm-btn')._list = list;
+  modal.classList.add('open');
+}
+function confirmRemix(){
+  const list = document.getElementById('remix-confirm-btn')._list;
+  if(!list) return;
+  tiers={};tierOrder=[];pool=[];
+  document.getElementById('list-title').value = list.title + ' (remix)';
+  document.getElementById('list-category').value = list.category || 'other';
+  list.tiers.forEach(t=>{tiers[t.label]=t.items.map(i=>({id:uid(),type:'text',label:i}));tierOrder.push(t.label);});
+  closeModal('remix-modal');
+  showPage('create');renderEditor();updateRender();toast('Loaded for remixing 🎨');
+}
+
+// ══════════════════════════════════════════════════════
+// TEMPLATES
+// ══════════════════════════════════════════════════════
+function renderTemplates(filter=''){
+  const container=document.getElementById('template-sections');
+  container.innerHTML='';
+  Object.entries(TEMPLATE_LIBRARY).forEach(([cat,templates])=>{
+    const filtered=filter?templates.filter(t=>t.name.toLowerCase().includes(filter)||t.items.some(i=>i.toLowerCase().includes(filter))):templates;
+    if(!filtered.length)return;
+    const section=document.createElement('div');
+    section.className='template-category-section';
+    section.innerHTML=`<div class="template-category-title">${cat}</div><div class="template-grid"></div>`;
+    container.appendChild(section);
+    const grid=section.querySelector('.template-grid');
+    filtered.forEach((tmpl,i)=>{
+      const card=document.createElement('div');
+      card.className='template-card';
+      card.style.animation=`fadeUp .25s ease ${i*.03}s both`;
+      card.innerHTML=`
+        <span class="template-card-emoji">${tmpl.emoji}</span>
+        <div class="template-card-name">${tmpl.name}</div>
+        <div class="template-card-count">${tmpl.items.length} items pre-loaded</div>
+        <div class="template-card-preview">${tmpl.items.slice(0,6).map(i=>`<span class="template-preview-item">${i}</span>`).join('')}</div>
+        <button class="template-card-btn" onclick="loadTemplate(event,this)">Use Template →</button>`;
+      card.querySelector('.template-card-btn')._tmpl=tmpl;
+      grid.appendChild(card);
+    });
+  });
+  if(!container.children.length)container.innerHTML='<p style="color:var(--muted);padding:20px 0">No templates found.</p>';
+}
+function searchTemplates(val){renderTemplates(val.toLowerCase().trim());}
+function loadTemplate(e,btn){
+  e.stopPropagation();
+  const tmpl=btn._tmpl;
+  tiers={};tierOrder=[];pool=[];
+  document.getElementById('list-title').value=tmpl.name.toUpperCase();
+  document.getElementById('list-category').value=tmpl.cat||'other';
+  TIER_DEFAULTS.forEach(t=>{tiers[t]=[];tierOrder.push(t);});
+  tmpl.items.forEach(item=>pool.push({id:uid(),type:'text',label:item}));
+  showPage('create');renderEditor();updateRender();
+  toast(`"${tmpl.name}" loaded — start ranking! 🔥`);
+}
+
+// ══════════════════════════════════════════════════════
+// CREATE
+// ══════════════════════════════════════════════════════
+function initCreate(){
+  tiers={};tierOrder=[];pool=[];
+  TIER_DEFAULTS.forEach(t=>{tiers[t]=[];tierOrder.push(t);});
+  renderEditor();updateRender();
+}
+function renderEditor(){
+  const container=document.getElementById('tier-list');
+  container.innerHTML='';
+  tierOrder.forEach((label,idx)=>{
+    const color=TIER_COLORS[label]||FALLBACK;
+    const row=document.createElement('div');
+    row.className='tier-row';row.dataset.tier=label;
+    row.ondragover=e=>onDragOver(e,label);
+    row.ondrop=e=>onDrop(e,label);
+    row.ondragleave=onDragLeave;
+    row.innerHTML=`
+      <div class="tier-label-wrap" style="background:${color}">
+        <input class="tier-label-input" value="${label}" maxlength="4" style="color:${getTC(color)}"
+          onchange="renameTier('${label}',this.value,${idx})">
+      </div>
+      <div class="tier-items-area" id="ta-${label}"></div>
+      <div class="tier-ctrl">
+        <button class="tier-ctrl-btn" onclick="moveTier(${idx},-1)">▲</button>
+        <button class="tier-ctrl-btn" onclick="moveTier(${idx},1)">▼</button>
+        <button class="tier-ctrl-btn del" onclick="deleteTier('${label}')">✕</button>
+      </div>`;
+    container.appendChild(row);
+    const area=row.querySelector(`#ta-${label}`);
+    (tiers[label]||[]).forEach(item=>area.appendChild(makeChip(item,label)));
+  });
+  renderPool();
+}
+function makeChip(item,source){
+  const el=document.createElement('div');
+  el.className=`item-chip ${item.type==='img'?'img-chip':'text-chip'}`;
+  el.draggable=true;
+  if(item.type==='img'){
+    el.innerHTML=`<img class="item-img" src="${item.src}" alt="${item.label}"><span class="item-chip-label">${item.label}</span><span class="item-del">✕</span>`;
+  }else{
+    el.innerHTML=`<span>${item.label}</span><span class="item-del">✕</span>`;
+  }
+  el.querySelector('.item-del').onclick=e=>{e.stopPropagation();deleteItem(item.id,source);};
+  el.ondragstart=()=>{dragItem={item,source};el.classList.add('dragging');};
+  el.ondragend=()=>el.classList.remove('dragging');
+  return el;
+}
+function renderPool(){
+  const p=document.getElementById('pool');
+  const ph=p.querySelector('.pool-empty');
+  [...p.querySelectorAll('.item-chip')].forEach(e=>e.remove());
+  pool.forEach(item=>p.appendChild(makeChip(item,'__pool__')));
+  if(ph)ph.style.display=pool.length?'none':'';
+}
+function onDragOver(e,target){
+  e.preventDefault();
+  const el=target==='__pool__'?document.getElementById('pool'):document.querySelector(`[data-tier="${target}"]`);
+  if(el)el.classList.add('drag-over');
+}
+function onDragLeave(){document.querySelectorAll('.drag-over').forEach(el=>el.classList.remove('drag-over'));}
+function onDrop(e,target){
+  e.preventDefault();onDragLeave();if(!dragItem)return;
+  const{item,source}=dragItem;
+  if(source==='__pool__')pool=pool.filter(i=>i.id!==item.id);
+  else tiers[source]=(tiers[source]||[]).filter(i=>i.id!==item.id);
+  if(target==='__pool__')pool.push(item);
+  else{if(!tiers[target])tiers[target]=[];tiers[target].push(item);}
+  dragItem=null;renderEditor();updateRender();
+}
+function addTextItem(){
+  const input=document.getElementById('text-input');
+  const val=input.value.trim();if(!val)return;
+  pool.push({id:uid(),type:'text',label:val});
+  input.value='';renderPool();
+}
+function handleImageUpload(input){
+  const labelInput=document.getElementById('img-label');
+  [...input.files].forEach(file=>{
+    const reader=new FileReader();
+    reader.onload=e=>{
+      const label=labelInput.value.trim()||file.name.replace(/\.[^.]+$/,'');
+      pool.push({id:uid(),type:'img',label,src:e.target.result});
+      labelInput.value='';renderPool();
+    };
+    reader.readAsDataURL(file);
+  });input.value='';
+}
+function deleteItem(id,source){
+  if(source==='__pool__')pool=pool.filter(i=>i.id!==id);
+  else tiers[source]=(tiers[source]||[]).filter(i=>i.id!==id);
+  renderEditor();updateRender();
+}
+function addTier(){
+  // Auto-generate next tier label
+  const letters=['G','H','I','J','K','L','M','N','O','P'];
+  const used=new Set(tierOrder);
+  let lbl=letters.find(l=>!used.has(l))||('T'+(tierOrder.length+1)).slice(0,4);
+  tiers[lbl]=[];tierOrder.push(lbl);renderEditor();updateRender();
+  toast('New tier added — click the label to rename');
+}
+function deleteTier(label){
+  pool.push(...(tiers[label]||[]));delete tiers[label];
+  tierOrder=tierOrder.filter(t=>t!==label);renderEditor();updateRender();
+}
+function moveTier(idx,dir){
+  const ni=idx+dir;if(ni<0||ni>=tierOrder.length)return;
+  [tierOrder[idx],tierOrder[ni]]=[tierOrder[ni],tierOrder[idx]];renderEditor();updateRender();
+}
+function renameTier(old,newLabel,idx){
+  const nl=newLabel.trim().toUpperCase().slice(0,4);
+  if(!nl||nl===old||tiers[nl]!==undefined)return;
+  tiers[nl]=tiers[old];delete tiers[old];tierOrder[idx]=nl;
+  setTimeout(()=>{renderEditor();updateRender();},0);
+}
+function resetCreate(){initCreate();toast('Reset ✓');}
+function updateRender(){
+  const title=document.getElementById('list-title').value.trim()||'MY TIER LIST';
+  document.getElementById('render-title').textContent=title.toUpperCase();
+  document.getElementById('wm-text').style.display=isPro?'none':'';
+  const container=document.getElementById('render-tiers');container.innerHTML='';
+  tierOrder.forEach(label=>{
+    const color=TIER_COLORS[label]||FALLBACK;
+    const items=tiers[label]||[];
+    const div=document.createElement('div');div.className='render-tier';
+    const itemsHTML=items.length
+      ?items.map(i=>i.type==='img'
+        ?`<div class="render-chip img"><img class="render-chip-img" src="${i.src}"><span class="render-chip-name">${i.label}</span></div>`
+        :`<div class="render-chip text">${i.label}</div>`).join('')
+      :'<span class="render-empty">—</span>';
+    div.innerHTML=`<div class="render-lbl" style="background:${color};color:${getTC(color)}">${label}</div><div class="render-items">${itemsHTML}</div>`;
+    container.appendChild(div);
+  });
+}
+function downloadImage(){
+  const title = document.getElementById('list-title').value.trim() || 'MY TIER LIST';
+  const scale = isPro ? 3 : 2;
+  const W = 800;
+  const TIER_H = 64;
+  const LABEL_W = 64;
+  const PAD = 10;
+  const CHIP_H = 32;
+  const CHIP_PAD_X = 12;
+  const CHIP_PAD_Y = 8;
+  const GAP = 6;
+  const FONT_LABEL = 'bold 28px Bebas Neue, Impact, sans-serif';
+  const FONT_ITEM  = 'bold 13px Syne, Arial, sans-serif';
+  const FONT_TITLE = 'bold 32px Bebas Neue, Impact, sans-serif';
+  const FONT_WM    = '11px Syne, Arial, sans-serif';
+
+  // Filter tiers that have items (always draw all tiers)
+  const activeTiers = tierOrder;
+
+  // Calculate total height
+  // Title bar: 56px, each tier: at least TIER_H, footer: 28px
+  const TITLE_H = 56;
+  const FOOTER_H = 28;
+  const totalH = TITLE_H + activeTiers.length * TIER_H + FOOTER_H;
+
+  const canvas = document.createElement('canvas');
+  canvas.width  = W * scale;
+  canvas.height = totalH * scale;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(scale, scale);
+
+  // Background
+  ctx.fillStyle = '#0d0d0d';
+  ctx.fillRect(0, 0, W, totalH);
+
+  // Title bar
+  ctx.fillStyle = '#111111';
+  ctx.fillRect(0, 0, W, TITLE_H);
+  ctx.strokeStyle = '#1a1a1a';
+  ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(0, TITLE_H); ctx.lineTo(W, TITLE_H); ctx.stroke();
+
+  ctx.font = FONT_TITLE;
+  ctx.fillStyle = '#e8ff3c';
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(title.toUpperCase(), 20, TITLE_H / 2);
+
+  if (!isPro) {
+    ctx.font = FONT_WM;
+    ctx.fillStyle = 'rgba(255,255,255,0.12)';
+    ctx.textAlign = 'right';
+    ctx.fillText('TIERFORGE.IO', W - 14, TITLE_H / 2);
+  }
+
+  // Draw each tier row
+  activeTiers.forEach((label, i) => {
+    const rowY = TITLE_H + i * TIER_H;
+    const color = TIER_COLORS[label] || FALLBACK;
+    const items = tiers[label] || [];
+
+    // Divider line
+    ctx.strokeStyle = '#1a1a1a';
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(0, rowY); ctx.lineTo(W, rowY); ctx.stroke();
+
+    // Label box
+    ctx.fillStyle = color;
+    ctx.fillRect(0, rowY, LABEL_W, TIER_H);
+    ctx.font = FONT_LABEL;
+    const tc = getTC(color);
+    ctx.fillStyle = tc;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(label, LABEL_W / 2, rowY + TIER_H / 2);
+
+    // Items area background
+    ctx.fillStyle = '#111111';
+    ctx.fillRect(LABEL_W, rowY, W - LABEL_W, TIER_H);
+
+    // Draw item chips
+    let x = LABEL_W + PAD;
+    const chipY = rowY + (TIER_H - CHIP_H) / 2;
+
+    items.forEach(item => {
+      ctx.font = FONT_ITEM;
+      const textW = ctx.measureText(item.label).width;
+      const chipW = textW + CHIP_PAD_X * 2;
+
+      // Chip background
+      ctx.fillStyle = '#1e1e1e';
+      roundRect(ctx, x, chipY, chipW, CHIP_H, 4);
+      ctx.fill();
+
+      // Chip border
+      ctx.strokeStyle = '#2a2a2a';
+      ctx.lineWidth = 1;
+      roundRect(ctx, x, chipY, chipW, CHIP_H, 4);
+      ctx.stroke();
+
+      // Chip text
+      ctx.fillStyle = '#e0e0e0';
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(item.label, x + CHIP_PAD_X, chipY + CHIP_H / 2);
+
+      x += chipW + GAP;
+      // Wrap to next line if needed (simple clip)
+      if (x > W - 20) x = LABEL_W + PAD;
+    });
+
+    // Empty tier placeholder
+    if (items.length === 0) {
+      ctx.font = '12px Syne, Arial, sans-serif';
+      ctx.fillStyle = '#2a2a2a';
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('—', LABEL_W + PAD, rowY + TIER_H / 2);
+    }
+  });
+
+  // Footer
+  const footerY = TITLE_H + activeTiers.length * TIER_H;
+  ctx.fillStyle = '#0a0a0a';
+  ctx.fillRect(0, footerY, W, FOOTER_H);
+  ctx.strokeStyle = '#1a1a1a';
+  ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(0, footerY); ctx.lineTo(W, footerY); ctx.stroke();
+  ctx.font = '10px Syne, Arial, sans-serif';
+  ctx.fillStyle = '#2a2a2a';
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('made with TIERFORGE.IO', 16, footerY + FOOTER_H / 2);
+
+  // Download
+  try {
+    const link = document.createElement('a');
+    link.download = title.toLowerCase().replace(/\s+/g, '-') + '.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+    toast('Downloaded! ✓');
+  } catch(e) {
+    // Fallback: open in new tab
+    const win = window.open();
+    if (win) {
+      win.document.write('<img src="' + canvas.toDataURL('image/png') + '" style="max-width:100%">');
+      toast('Opened in new tab — right-click to save! ✓');
+    } else {
+      toast('Allow popups, then try again');
+    }
+  }
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+}
+function openPublish(){
+  const title=document.getElementById('list-title').value.trim();
+  if(!title)return toast('Add a title first!');
+  const hasItems=tierOrder.some(t=>(tiers[t]||[]).length>0);
+  if(!hasItems)return toast('Add some items to tiers first!');
+  openModal('publish-modal');
+}
+function publishList(){
+  const author=document.getElementById('pub-author').value.trim()||'Anonymous';
+  const title=document.getElementById('list-title').value.trim()||'Untitled';
+  const category=document.getElementById('list-category').value;
+  communityLists.unshift({
+    id:Date.now(),title:title.toUpperCase(),category,author,votes:0,userVoted:false,
+    tiers:tierOrder.map(label=>({label,color:TIER_COLORS[label]||FALLBACK,items:(tiers[label]||[]).map(i=>i.label)})).filter(t=>t.items.length>0)
+  });
+  closeModal('publish-modal');showPage('explore');toast('Published! 🎉 Live on Explore now.');
+}
+function openPaywall(){openModal('paywall-modal');}
+function openModal(id){document.getElementById(id).classList.add('open');}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+document.querySelectorAll('.modal-overlay').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');}));
+function simulatePurchase(){
+  isPro=true;closeModal('paywall-modal');
+  document.getElementById('wm-text').style.display='none';
+  updateRender();toast('✦ Pro unlocked! No more watermark. 🎉');
+}
+function switchAddTab(tab,btn){
+  document.querySelectorAll('.add-tab').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.add-content').forEach(c=>c.classList.remove('active'));
+  btn.classList.add('active');document.getElementById('add-'+tab).classList.add('active');
+}
+function getTC(hex){
+  if(!hex||hex.length<7)return'#fff';
+  const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);
+  return(r*299+g*587+b*114)/1000>128?'#000':'#fff';
+}
+let _tt;
+function toast(msg){
+  const ex=document.querySelector('.toast');if(ex)ex.remove();
+  const el=document.createElement('div');el.className='toast';el.innerHTML=msg;
+  document.body.appendChild(el);clearTimeout(_tt);_tt=setTimeout(()=>el.remove(),3200);
+}
+
+// BOOT
+initCommunity();initCreate();renderExplore('all');
+</script>
+
+<!-- REMIX MODAL -->
+<div class="modal-overlay" id="remix-modal">
+  <div class="modal" style="width:min(520px,94vw)">
+    <button class="modal-close" onclick="closeModal('remix-modal')">✕</button>
+    <div class="modal-banner" style="background:linear-gradient(135deg,#0d0d1a,#060610);border-bottom:1px solid #1a1a2e">
+      <h2 id="remix-title" style="color:var(--accent);font-size:28px"></h2>
+      <p><span id="remix-author" style="color:var(--muted2)"></span> &nbsp;·&nbsp; <span id="remix-votes" style="color:var(--muted)"></span></p>
+    </div>
+    <div class="modal-body">
+      <div id="remix-preview" style="margin-bottom:20px;max-height:320px;overflow-y:auto"></div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <button id="remix-confirm-btn" class="btn btn-primary" style="width:100%;padding:12px" onclick="confirmRemix()">🎨 Load & Remix This List</button>
+        <button class="btn btn-ghost" style="width:100%" onclick="closeModal('remix-modal')">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
